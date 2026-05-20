@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  SUBSCRIPTION_PENDING
+  SUBSCRIPTION_WAITING_APPROVAL
+  ACTIVE
+  REJECTED
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  YEARLY
+}
+
+enum AppointmentStatus {
+  BOOKED
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  role           Role
+  name           String
+  phone          String?
+  isBlocked      Boolean  @default(false)
+  image          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  doctorProfile  DoctorProfile?
+  patientProfile PatientProfile?
+  adminLogs      AdminLog[]
+  adminPermissions AdminPermission[]
+  notifications  Notification[]
+}
+
+model DoctorProfile {
+  id                    String              @id @default(cuid())
+  userId                String              @unique
+  user                  User                @relation(fields: [userId], references: [id])
+  specialization        String
+  certificateUrl        String
+  about                 String?
+  isVerified            Boolean             @default(false)
+  subscriptionStatus    SubscriptionStatus  @default(PENDING_VERIFICATION)
+  subscriptionPlan      SubscriptionPlan?
+  paymentProofUrl       String?
+  walletBalance         Float               @default(0)
+  workingHoursJson      Json?
+  insuranceAmount       Float               @default(1000)
+  profileImageUrl       String?
+  bio                   String?
+  wilaya                String
+  commune               String
+  googleMapsLink        String
+  ccpNumber             String?
+  subscriptionExpiresAt DateTime?
+  subscriptionRequests  SubscriptionRequest[]
+  appointments          Appointment[]
+  withdrawalRequests    WithdrawalRequest[]
+  walletTransactions    WalletTransaction[]
+}
+
+model PatientProfile {
+  id             String              @id @default(cuid())
+  userId         String              @unique
+  user           User                @relation(fields: [userId], references: [id])
+  walletAvailable Float             @default(0)
+  walletFrozen   Float               @default(0)
+  topupRequests  WalletTopupRequest[]
+  appointments   Appointment[]
+  walletTransactions WalletTransaction[]
+}
+
+model Appointment {
+  id                  String            @id @default(cuid())
+  patientId           String
+  patient             PatientProfile    @relation(fields: [patientId], references: [id])
+  doctorId            String
+  doctor              DoctorProfile     @relation(fields: [doctorId], references: [id])
+  dateTime            DateTime
+  status              AppointmentStatus @default(BOOKED)
+  insuranceAmount     Float
+  isManual            Boolean           @default(false)
+  attended            Boolean?
+  cancellationDeadline DateTime
+  createdAt           DateTime          @default(now())
+  review              Review?
+}
+
+model Review {
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  ratingClinic  Int
+  ratingService Int
+  comment       String?
+  createdAt     DateTime    @default(now())
+}
+
+model SubscriptionRequest {
+  id              String          @id @default(cuid())
+  doctorId        String
+  doctor          DoctorProfile   @relation(fields: [doctorId], references: [id])
+  plan            SubscriptionPlan
+  paymentProofUrl String
+  status          RequestStatus   @default(PENDING)
+  adminNote       String?
+  createdAt       DateTime        @default(now())
+}
+
+model WalletTopupRequest {
+  id              String         @id @default(cuid())
+  patientId       String
+  patient         PatientProfile @relation(fields: [patientId], references: [id])
+  amount          Float
+  paymentProofUrl String
+  status          RequestStatus  @default(PENDING)
+  createdAt       DateTime       @default(now())
+}
+
+model WithdrawalRequest {
+  id          String         @id @default(cuid())
+  doctorId    String
+  doctor      DoctorProfile  @relation(fields: [doctorId], references: [id])
+  amount      Float
+  status      RequestStatus  @default(PENDING)
+  processedAt DateTime?
+  createdAt   DateTime       @default(now())
+}
+
+model SystemSettings {
+  id            String   @id @default(cuid())
+  ccpNumber     String   @default("")
+  ccpHolder     String   @default("")
+  ccpPhone      String   @default("")
+  monthlyPrice  Float    @default(2000)
+  yearlyPrice   Float    @default(20000)
+  supportEmail  String   @default("contact@docspot.dz")
+  updatedAt     DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   @default("info")
+  createdAt DateTime @default(now())
+}
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  admin     User     @relation(fields: [adminId], references: [id])
+  action    String
+  details   Json
+  ip        String
+  createdAt DateTime @default(now())
+}
+
+model AdminPermission {
+  id            String @id @default(cuid())
+  adminId       String
+  admin         User   @relation(fields: [adminId], references: [id])
+  permissionKey String
+}
+
+model WalletTransaction {
+  id          String         @id @default(cuid())
+  doctorId    String?
+  doctor      DoctorProfile? @relation(fields: [doctorId], references: [id])
+  patientId   String?
+  patient     PatientProfile? @relation(fields: [patientId], references: [id])
+  amount      Float
+  type        String         // "INCOME" or "WITHDRAWAL" for Doctor, "TOPUP", "REFUND", "PENALTY" for Patient
+  description String
+  createdAt   DateTime       @default(now())
+}
+
