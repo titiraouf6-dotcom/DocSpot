@@ -237,14 +237,37 @@ export default function DoctorProfilePage() {
             </div>
           </div>
 
-          {/* About Section */}
-          {doctor.about && (
-            <section className="card bg-gradient-to-br from-white to-emerald-50/10">
-              <h3 className="text-xl font-display font-bold text-gray-dark mb-4 flex items-center gap-3">
+          {/* About & Bio Section */}
+          {(doctor.about || doctor.bio) && (
+            <section className="card bg-gradient-to-br from-white to-emerald-50/10 space-y-6">
+              <h3 className="text-xl font-display font-bold text-gray-dark flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary/10"><FileText className="w-5 h-5 text-primary" /></div>
-                نبذة عن الطبيب
+                السيرة والوصف
               </h3>
-              <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap font-sans">{doctor.about}</p>
+
+              {doctor.about && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1 h-5 rounded-full bg-primary"></span>
+                    <h4 className="font-display font-bold text-primary">نبذة تعريفية</h4>
+                  </div>
+                  <div className="p-5 bg-gray-50/80 rounded-2xl border border-gray-100">
+                    <p className="text-gray-600 leading-relaxed text-base whitespace-pre-wrap font-sans">{doctor.about}</p>
+                  </div>
+                </div>
+              )}
+
+              {doctor.bio && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1 h-5 rounded-full bg-primary"></span>
+                    <h4 className="font-display font-bold text-primary">المؤهلات والخبرات</h4>
+                  </div>
+                  <div className="p-5 bg-gray-50/80 rounded-2xl border border-gray-100">
+                    <p className="text-gray-600 leading-relaxed text-base whitespace-pre-wrap font-sans">{doctor.bio}</p>
+                  </div>
+                </div>
+              )}
             </section>
           )}
 

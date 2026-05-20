@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
     };
 
     const subscriptionStatuses = statuses.map((s) => ({
-      status: statusLabels[s.subscriptionStatus] || s.subscriptionStatus,
+      status: s.subscriptionStatus,
       count: s._count.id,
     }));
 
@@ -120,8 +120,8 @@ export async function GET(req: NextRequest) {
       newUsersPeriod,
       newDoctorsPeriod,
       newPatientsPeriod,
-      appointmentsPerMonth,
-      subscriptionStatuses,
+      monthlyAppointments: appointmentsPerMonth,
+      subscriptionStats: subscriptionStatuses,
       financialStats,
     });
   } catch {

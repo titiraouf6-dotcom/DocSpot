@@ -19,8 +19,9 @@ const patientLinks = [
 
 const doctorLinks = [
   { href: "/doctor", label: "الرئيسية", icon: Home },
-  { href: "/doctor/appointments", label: "الجدول", icon: Calendar },
+  { href: "/doctor/appointments", label: "المواعيد", icon: Calendar },
   { href: "/doctor/patients", label: "المرضى", icon: Users },
+  { href: "/doctor/schedule", label: "الجدول", icon: Clock },
   { href: "/doctor/wallet", label: "المحفظة", icon: Wallet },
   { href: "/doctor/settings", label: "الإعدادات", icon: Settings },
 ];
@@ -29,7 +30,9 @@ const adminLinks = [
   { href: "/admin", label: "الرئيسية", icon: LayoutDashboard },
   { href: "/admin/doctors", label: "الأطباء", icon: Stethoscope },
   { href: "/admin/topups", label: "الشحن", icon: CreditCard },
+  { href: "/admin/withdrawals", label: "السحب", icon: Banknote },
   { href: "/admin/users", label: "المستخدمون", icon: Users },
+  { href: "/admin/admins", label: "المشرفين", icon: ClipboardList },
   { href: "/admin/settings", label: "الإعدادات", icon: Settings },
 ];
 

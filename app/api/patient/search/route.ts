@@ -10,11 +10,14 @@ export async function GET(req: NextRequest) {
     const commune = searchParams.get("commune");
     const specialization = searchParams.get("specialization");
     const search = searchParams.get("search");
+    const doctorId = searchParams.get("doctorId");
 
     const where: any = {
       subscriptionStatus: "ACTIVE",
       user: { isBlocked: false },
     };
+
+    if (doctorId) where.id = doctorId;
 
     if (wilaya) where.wilaya = wilaya;
     if (commune) where.commune = commune;
