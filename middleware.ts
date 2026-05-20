@@ -5,7 +5,18 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+  import { getToken } from "next-auth/jwt";
+
+// ... داخل دالة middleware ...
+
+const token = await getToken({
+  req,
+  secret: process.env.NEXTAUTH_SECRET,
+  secureCookie: process.env.NODE_ENV === "production",
+  cookieName: process.env.NODE_ENV === "production"
+    ? "__Secure-authjs.session-token" // اسم الكوكيز في الإنتاج (Vercel)
+    : "authjs.session-token",         // اسم الكوكيز في التطوير المحلي
+});
 
   // Public paths - redirect logged in users to their dashboard
   const publicPaths = ["/", "/login", "/register"];
